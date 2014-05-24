@@ -66,5 +66,5 @@ api :: (MonadIO m, FromJSON a) =>
 api path params = do
   response <- makeRequest path params >>= sendRequest >>= parseResponse
   when (apiResult response /= 1) $ throwError (KCSError (apiResultMsg response))
-  return $ apiData response
+  maybe (throwError undefined) return (apiData response)
 

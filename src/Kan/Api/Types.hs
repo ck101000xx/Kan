@@ -33,10 +33,11 @@ newtype ApiT m a = ApiT
 
 instance MonadTrans ApiT where
   lift = ApiT . lift . lift 
+
 data ApiResponse a = ApiResponse
   { apiResult :: Int
   , apiResultMsg :: String
-  , apiData :: a
+  , apiData :: Maybe a
   }
 
 instance (FromJSON a) => FromJSON (ApiResponse a) where
@@ -44,5 +45,5 @@ instance (FromJSON a) => FromJSON (ApiResponse a) where
     ApiResponse <$>
       v .: "api_result" <*>
       v .: "api_result_msg" <*>
-      v .: "api_data"
+      v .:? "api_data"
 
