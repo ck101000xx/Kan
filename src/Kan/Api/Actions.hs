@@ -23,5 +23,5 @@ apiBasic :: (MonadIO m) => ApiT m Basic
 apiBasic = apiGetMember "/basic" []
 
 apiShip :: (MonadIO m) => ApiT m [Ship]
-apiShip = apiGetMember "ship" []
+apiShip = apiGetMember "/ship" []
 
