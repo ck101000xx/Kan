@@ -10,16 +10,23 @@ import Control.Applicative
 import Control.Monad.Trans
 import Data.Aeson
 import Data.ByteString.Char8
+import Data.Monoid
 import Data.Time.Clock.POSIX
 
-start2 :: (MonadIO m, FromJSON a) => ApiT m a
-start2 = api "/api_start2" []
+apiStart2 :: (MonadIO m, FromJSON a) => ApiT m a
+apiStart2 = api "/api_start2" []
 
-basic :: (MonadIO m) => ApiT m Basic
-basic = api "/api_get_member/basic" []
+apiGetMember :: (MonadIO m) => ByteString -> (ByteString, ByteString) -> ApiT m a
+apiGetMember = api . ("/api_get_member" <>)
 
-port :: (Functor m, MonadIO m, FromJSON a) => ApiT m a
-port = do
+apiBasic :: (MonadIO m) => ApiT m Basic
+apiBasic = getMember "/basic" []
+
+apiShip :: (MonadIO m) => ApiT m [Ship]
+apiShip = getMember "ship" []
+
+apiPort :: (Functor m, MonadIO m, FromJSON a) => ApiT m a
+apiPort = do
   fmap memberId basic
   portNum <- fmap memberId basic >>= fmap (lift . liftIO) getPortNum
   api "/api_port/port" [("api_port", portNum), ("api_sort_key", "5"), ("spi_sort_order", "2")]
