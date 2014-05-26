@@ -20,8 +20,8 @@ apiGetMember :: (MonadIO m) => ByteString -> (ByteString, ByteString) -> ApiT m 
 apiGetMember = api . ("/api_get_member" <>)
 
 apiBasic :: (MonadIO m) => ApiT m Basic
-apiBasic = getMember "/basic" []
+apiBasic = apiGetMember "/basic" []
 
 apiShip :: (MonadIO m) => ApiT m [Ship]
-apiShip = getMember "ship" []
+apiShip = apiGetMember "ship" []
 
