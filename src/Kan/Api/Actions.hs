@@ -1,22 +1,26 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Kan.Api.Actions
- ( start2
- , basic
- , port
+ ( apiStart2
+ , apiBasic
+ , apiShip
+ , apiDeck
+ , apiHokyuCharge
+ , apiMissionStart
  ) where
 
 import Kan.Api
+import Kan.Api.Actions.Types
 import Control.Applicative
 import Control.Monad.Trans
 import Data.Aeson
-import Data.ByteString.Char8
+import Data.ByteString.Char8 as B
 import Data.Monoid
 import Data.Time.Clock.POSIX
 
 apiStart2 :: (MonadIO m, FromJSON a) => ApiT m a
 apiStart2 = api "/api_start2" []
 
-apiGetMember :: (MonadIO m) => ByteString -> (ByteString, ByteString) -> ApiT m a
+apiGetMember :: (FromJSON a, MonadIO m) => ByteString -> [(ByteString, ByteString)] -> ApiT m a
 apiGetMember = api . ("/api_get_member" <>)
 
 apiBasic :: (MonadIO m) => ApiT m Basic
@@ -25,3 +29,27 @@ apiBasic = apiGetMember "/basic" []
 apiShip :: (MonadIO m) => ApiT m [Ship]
 apiShip = apiGetMember "/ship" []
 
+apiDeck :: (MonadIO m) => ApiT m Deck
+apiDeck = apiGetMember "/deck" []
+
+apiHokyuCharge :: (MonadIO m) => ChargeKind -> [ShipId] -> ApiT m ()
+apiHokyuCharge req = do
+  api "/api_req_hokyu/charge" $
+    [ ("api_kind", convertKind $ kind req)
+    , ("api_onslot", "1")
+    , ("api_id_items", convertIds $ ids req) ]
+  return ()
+  where
+    convertKind kind =
+      case kind of
+        Fuel   -> "1"
+        Bullet -> "2"
+        Both   -> "3"
+    convertIds = B.intercalate "," . Prelude.map (pack . show . unShipId)
+
+apiMissionStart :: (MonadIO m) => ShipId -> MissionId -> ApiT m ()
+apiMissionStart deck mission = do
+  api "/api_req_mission/start" $
+    [ ("api_deck_id", pack . show $ deck)
+    , ("api_mission_id", pack . show $ mission)
+    ]

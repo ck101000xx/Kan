@@ -26,6 +26,7 @@ executable Kan
                        mtl,
                        http-types,
                        http-client,
-                       time
+                       time,
+                       vector
   hs-source-dirs:      src
   default-language:    Haskell2010
