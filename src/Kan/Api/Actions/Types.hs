@@ -28,6 +28,13 @@ data Deck = Deck
   , mission :: Maybe (MissionState, MissionId, UTCTime, Int)
   } deriving (Show)
 
+data MissionState = Running | Complete deriving (Show)
+
+data Ship = Ship
+  { id :: ShipId
+  }
+
+deriveApiData ''Ship
 
 instance FromJSON Deck where
   parseJSON (Object v) =
