@@ -40,23 +40,23 @@ apiDeck :: (MonadIO m) => ApiT m Deck
 apiDeck = apiGetMember "/deck" []
 
 apiHokyuCharge :: (MonadIO m) => ChargeKind -> [ShipId] -> ApiT m ()
-apiHokyuCharge req = do
-  api "/api_req_hokyu/charge" $
-    [ ("api_kind", convertKind $ kind req)
+apiHokyuCharge kind ids =
+  api' "/api_req_hokyu/charge" $
+    [ ("api_kind", convertKind kind)
     , ("api_onslot", "1")
-    , ("api_id_items", convertIds $ ids req) ]
-  return ()
+    , ("api_id_items", convertIds ids) ]
   where
     convertKind kind =
       case kind of
         Fuel   -> "1"
         Bullet -> "2"
         Both   -> "3"
-    convertIds = B.intercalate "," . Prelude.map (pack . show . unShipId)
+    convertIds = B.intercalate "," . Prelude.map convertId
+    convertId (ShipId i) = pack . show $ i
 
-apiMissionStart :: (MonadIO m) => ShipId -> MissionId -> ApiT m ()
-apiMissionStart deck mission = do
-  api "/api_req_mission/start" $
+apiMissionStart :: (MonadIO m) => DeckId -> MissionId -> ApiT m ()
+apiMissionStart (DeckId deck) (MissionId mission) =
+  api' "/api_req_mission/start" $
     [ ("api_deck_id", pack . show $ deck)
     , ("api_mission_id", pack . show $ mission)
     ]
