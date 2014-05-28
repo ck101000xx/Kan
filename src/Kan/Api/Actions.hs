@@ -18,6 +18,12 @@ import Data.ByteString.Char8 as B
 import Data.Monoid
 import Data.Time.Clock.POSIX
 
+api' :: (MonadIO m) =>  ByteString -> [(ByteString, ByteString)] -> ApiT m ()
+api' path params = go >> return ()
+  where
+    go :: (MonadIO m) => ApiT m Value
+    go = api path params
+
 apiStart2 :: (MonadIO m, FromJSON a) => ApiT m a
 apiStart2 = api "/api_start2" []
 
