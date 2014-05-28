@@ -8,6 +8,8 @@ import Data.Time.Clock.POSIX
 import Data.Vector
 import Kan.Api.Actions.TH
 
+newtype DeckId = DeckId Int deriving (Show, Eq, ToJSON, FromJSON)
+
 newtype ShipId = ShipId Int deriving (Show, Eq, ToJSON, FromJSON)
 
 newtype MissionId = MissionId Int deriving (Show, Eq, ToJSON, FromJSON)
