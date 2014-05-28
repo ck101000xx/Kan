@@ -2,6 +2,7 @@
 {-# LANGUAGE FlexibleContexts #-}
 module Kan.Api
   ( module Kan.Api.Types
+  , newEnv
   , runApiT
   , api
   ) where
@@ -24,6 +25,17 @@ import Network.HTTP.Types
 
 runApiT :: Env -> ApiT m a -> m (Either ApiError a)
 runApiT env = runErrorT . flip runReaderT env . unApiT
+
+newEnv ::
+  ByteString -> -- token
+  ByteString -> -- server
+  IO Env
+newEnv token server = do
+  manager <- newManager defaultManagerSettings
+  return $ Env
+    { token = token
+    , server = server
+    , manager = manager }
 
 makeRequest :: (MonadReader Env m) =>
   ByteString -> -- path
