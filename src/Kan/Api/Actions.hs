@@ -6,6 +6,7 @@ module Kan.Api.Actions
  , apiDeck
  , apiHokyuCharge
  , apiMissionStart
+ , apiMissionResult
  ) where
 
 import Kan.Api
@@ -53,3 +54,8 @@ apiMissionStart deck mission = do
     [ ("api_deck_id", pack . show $ deck)
     , ("api_mission_id", pack . show $ mission)
     ]
+
+apiMissionResult :: (MonadIO m) => DeckId -> ApiT m ()
+apiMissionResult (DeckId deck) =
+  api' "/api_req_mission/result" [("api_deck_id", pack . show $ deck)]
+
