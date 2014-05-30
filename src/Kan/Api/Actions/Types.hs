@@ -36,6 +36,9 @@ data Ship = Ship
 
 deriveApiData ''Ship
 
+parseTime :: Integer -> UTCTime
+parseTime = posixSecondsToUTCTime . fromRational . (% 1000)
+
 instance FromJSON Deck where
   parseJSON (Object v) =
     let
@@ -49,7 +52,7 @@ instance FromJSON Deck where
             1 -> Running
             2 -> Complete
         , MissionId b
-        , posixSecondsToUTCTime  . fromRational $ c % 1000
+        , parseTime c
         , d )
     in
       Deck <$>
@@ -61,3 +64,11 @@ data ChargeKind =
   Bullet |
   Both
 
+data HokyuCharge = HokyuCharge
+  { completeTime :: UTCTime
+  } deriving (Show)
+
+instance FromJSON HokyuCharge where
+  parseJSON (Object v) =
+    HokyuCharge <$>
+      (parseTime <$> v .: "api_complatetime")

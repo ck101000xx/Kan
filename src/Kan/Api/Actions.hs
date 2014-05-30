@@ -39,9 +39,9 @@ apiShip = apiGetMember "/ship" []
 apiDeck :: (MonadIO m) => ApiT m Deck
 apiDeck = apiGetMember "/deck" []
 
-apiHokyuCharge :: (MonadIO m) => ChargeKind -> [ShipId] -> ApiT m ()
+apiHokyuCharge :: (MonadIO m) => ChargeKind -> [ShipId] -> ApiT m HokyuCharge
 apiHokyuCharge kind ids =
-  api' "/api_req_hokyu/charge" $
+  api "/api_req_hokyu/charge" $
     [ ("api_kind", convertKind kind)
     , ("api_onslot", "1")
     , ("api_id_items", convertIds ids) ]
