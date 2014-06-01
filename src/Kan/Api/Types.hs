@@ -1,9 +1,15 @@
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE OverloadedStrings #-}
 module Kan.Api.Types where
 import Data.Aeson
 import Data.ByteString.Char8
 import Control.Applicative
+import Control.Monad.Base
+import Control.Monad.Trans.Control
 import Control.Monad.Trans
 import System.Log.FastLogger (LogStr)
 import Control.Monad.Logger
@@ -42,6 +48,23 @@ runApiT action env logger = runErrorT . flip runLoggingT logger . flip runReader
 
 instance MonadTrans ApiT where
   lift = ApiT . lift . lift . lift 
+
+instance (MonadBase b m) => MonadBase b (ApiT m) where
+  liftBase = liftBaseDefault
+
+instance MonadTransControl ApiT where
+  newtype StT ApiT a = StApi {unStApi :: StT (ErrorT ApiError) (StT LoggingT (StT (ReaderT Env) a)) }
+  liftWith f = ApiT $
+    liftWith $ \runStReader ->
+      liftWith $ \runStLogging ->
+        liftWith $ \runStError ->
+          f $ (liftM StApi . runStError . runStLogging . runStReader . unApiT)
+  restoreT = ApiT . restoreT . restoreT . restoreT . liftM unStApi
+
+instance MonadBaseControl b m => MonadBaseControl b (ApiT m) where
+  newtype StM (ApiT m) a = StMApi {unStMApi :: ComposeSt ApiT m a}
+  liftBaseWith = defaultLiftBaseWith StMApi
+  restoreM     = defaultRestoreM   unStMApi
 
 data ApiResponse a = ApiResponse
   { apiResult :: Int
