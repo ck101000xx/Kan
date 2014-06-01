@@ -4,7 +4,14 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE OverloadedStrings #-}
-module Kan.Api.Types where
+module Kan.Api.Types
+  ( Token
+  , ApiError(..)
+  , Env(..)
+  , ApiT
+  , runApiT
+  , ApiResponse(..)
+  ) where
 import Data.Aeson
 import Data.ByteString.Char8
 import Control.Applicative
