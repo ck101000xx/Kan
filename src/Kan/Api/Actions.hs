@@ -37,7 +37,7 @@ apiBasic = apiGetMember "/basic" []
 apiShip :: (MonadIO m) => ApiT m [Ship]
 apiShip = apiGetMember "/ship" []
 
-apiDeck :: (MonadIO m) => ApiT m Deck
+apiDeck :: (MonadIO m) => ApiT m [Deck]
 apiDeck = apiGetMember "/deck" []
 
 apiHokyuCharge :: (MonadIO m) => ChargeKind -> [ShipId] -> ApiT m HokyuCharge
