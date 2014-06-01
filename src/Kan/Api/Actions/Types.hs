@@ -1,7 +1,17 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
-module Kan.Api.Actions.Types where
+module Kan.Api.Actions.Types
+ ( DeckId(..)
+ , ShipId(..)
+ , MissionId(..)
+ , Basic(..)
+ , Deck(..)
+ , MissionState(..)
+ , Ship(..)
+ , ChargeKind(..)
+ , HokyuCharge(..)
+ ) where
 import Control.Applicative
 import Data.Aeson
 import Data.Ratio
