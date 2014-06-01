@@ -1,6 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Kan.Api.Actions
- ( apiStart2
+ ( module Kan.Api.Actions.Types
+ , apiStart2
  , apiBasic
  , apiShip
  , apiDeck
