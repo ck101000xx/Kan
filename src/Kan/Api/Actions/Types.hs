@@ -31,7 +31,9 @@ data Basic = Basic
   -- TODO 
   } deriving (Show)
 
-deriveApiData ''Basic
+instance FromJSON Basic where
+  parseJSON (Object v) = Basic <$>
+    (read <$> v .: "api_member_id")
 
 data Deck = Deck
   { ship :: Vector (Maybe ShipId)
