@@ -5,6 +5,8 @@ import Data.Aeson
 import Data.ByteString.Char8
 import Control.Applicative
 import Control.Monad.Trans
+import System.Log.FastLogger (LogStr)
+import Control.Monad.Logger
 import Control.Monad.Reader
 import Control.Monad.Error
 import Network.HTTP.Client (Manager, HttpException)
@@ -28,11 +30,18 @@ data Env = Env
   }
 
 newtype ApiT m a = ApiT
-  { unApiT :: ReaderT Env (ErrorT ApiError m) a
-  } deriving (Functor, Monad, MonadReader Env, MonadError ApiError, MonadIO)
+  { unApiT :: ReaderT Env (LoggingT (ErrorT ApiError m)) a
+  } deriving (Functor, Applicative, Monad, MonadReader Env, MonadError ApiError, MonadLogger)
+
+runApiT :: (MonadLogger m) =>
+  ApiT m a ->
+  Env ->
+  (Loc -> LogSource -> LogLevel -> LogStr -> IO ()) ->
+  m (Either ApiError a)
+runApiT action env logger = runErrorT . flip runLoggingT logger . flip runReaderT env . unApiT $ action
 
 instance MonadTrans ApiT where
-  lift = ApiT . lift . lift 
+  lift = ApiT . lift . lift . lift 
 
 data ApiResponse a = ApiResponse
   { apiResult :: Int
