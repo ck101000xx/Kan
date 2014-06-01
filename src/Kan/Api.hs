@@ -3,7 +3,6 @@
 module Kan.Api
   ( module Kan.Api.Types
   , newEnv
-  , runApiT
   , api
   ) where
 
@@ -22,9 +21,6 @@ import Data.Either
 import Data.Monoid
 import Network.HTTP.Client
 import Network.HTTP.Types
-
-runApiT :: Env -> ApiT m a -> m (Either ApiError a)
-runApiT env = runErrorT . flip runReaderT env . unApiT
 
 newEnv ::
   ByteString -> -- token
