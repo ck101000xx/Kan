@@ -1,4 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TemplateHaskell #-}
 module Kan.Api.Actions
  ( module Kan.Api.Actions.Types
  , apiStart2
@@ -14,6 +15,7 @@ import Kan.Api
 import Kan.Api.Actions.Types
 import Control.Applicative
 import Control.Monad.Trans
+import Control.Monad.Logger
 import Data.Aeson
 import Data.ByteString.Char8 as B
 import Data.Monoid
