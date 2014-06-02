@@ -10,14 +10,14 @@ module Kan.Api.Actions.Types
  , MissionState(..)
  , Ship(..)
  , ChargeKind(..)
- , HokyuCharge(..)
+ , MissionStart(..)
  ) where
+
 import Control.Applicative
 import Data.Aeson
 import Data.Ratio
 import Data.Time.Clock
 import Data.Time.Clock.POSIX
-import Data.Vector
 import Kan.Api.Actions.TH
 
 newtype DeckId = DeckId Int deriving (Show, Eq, ToJSON, FromJSON)
@@ -36,7 +36,8 @@ instance FromJSON Basic where
     (read <$> v .: "api_member_id")
 
 data Deck = Deck
-  { ship :: Vector (Maybe ShipId)
+  { deckId :: DeckId
+  , ship :: [Maybe ShipId]
   , mission :: Maybe (MissionState, MissionId, UTCTime, Int)
   } deriving (Show)
 
@@ -68,6 +69,7 @@ instance FromJSON Deck where
         , d )
     in
       Deck <$>
+        (DeckId <$> v .: "api_id") <*>
         (fmap parseMaybeShipId  <$> v .: "api_ship") <*>
         (parseMission <$> v .: "api_mission")
 
@@ -76,11 +78,11 @@ data ChargeKind =
   Bullet |
   Both
 
-data HokyuCharge = HokyuCharge
+data MissionStart = MissionStart
   { completeTime :: UTCTime
   } deriving (Show)
 
-instance FromJSON HokyuCharge where
+instance FromJSON MissionStart where
   parseJSON (Object v) =
-    HokyuCharge <$>
+    MissionStart <$>
       (parseTime <$> v .: "api_complatetime")
