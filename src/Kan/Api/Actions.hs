@@ -54,7 +54,7 @@ apiHokyuCharge kind ids =
         Fuel   -> "1"
         Bullet -> "2"
         Both   -> "3"
-    convertIds = B.intercalate "," . Prelude.map convertId
+    convertIds = B.intercalate "," . fmap convertId
     convertId (ShipId i) = pack . show $ i
 
 apiMissionStart :: (MonadIO m) => DeckId -> MissionId -> ApiT m MissionStart
@@ -66,5 +66,19 @@ apiMissionStart (DeckId deck) (MissionId mission) = do
 
 apiMissionResult :: (MonadIO m) => DeckId -> ApiT m ()
 apiMissionResult (DeckId deck) =
-  api' "/api_req_mission/result" [("api_deck_id", pack . show $ deck)]
+  apiPort >> api' "/api_req_mission/result" [("api_deck_id", pack . show $ deck)]
 
+apiPort :: (MonadIO m) => ApiT m ()
+apiPort = do
+  portNum <- fmap memberId apiBasic >>= fmap (lift . liftIO) getPortNum
+  api' "/api_port/port" [("api_port", portNum), ("api_sort_key", "5"), ("spi_sort_order", "2")]
+  where
+    getPortNum memberId = do
+      time <- fmap floor getPOSIXTime
+      return . pack $
+        '1' : show (memberId `mod` 1000) ++
+        show ((9999999999 - time - memberId) * array !! (memberId `mod` 10)) ++
+        suffix
+      where
+        suffix = "1000"
+        array = [1802, 9814, 5616, 4168, 7492, 5188, 2753, 8118, 6381, 7636]
